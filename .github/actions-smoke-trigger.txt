@@ -1,0 +1,1 @@
+Trigger safe public Actions smoke test.
