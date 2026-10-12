@@ -1,0 +1,8 @@
+ALTER TABLE products ADD COLUMN brand TEXT;
+ALTER TABLE products ADD COLUMN model TEXT;
+ALTER TABLE products ADD COLUMN sku TEXT;
+ALTER TABLE products ADD COLUMN specs_text TEXT;
+ALTER TABLE products ADD COLUMN seo_title TEXT;
+ALTER TABLE products ADD COLUMN seo_description TEXT;
+ALTER TABLE products ADD COLUMN image_is_sample INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE products ADD COLUMN seo_ready INTEGER NOT NULL DEFAULT 0;

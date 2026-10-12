@@ -1,0 +1,3 @@
+ALTER TABLE orders ADD COLUMN province TEXT;
+ALTER TABLE orders ADD COLUMN address TEXT;
+ALTER TABLE orders ADD COLUMN postal_code TEXT;
