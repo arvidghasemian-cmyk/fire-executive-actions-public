@@ -1,0 +1,11 @@
+{
+  "appId": "ir.fireexecutive.pro",
+  "appName": "Fire Executive Pro",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
