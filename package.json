@@ -1,0 +1,17 @@
+{
+  "name": "fire-executive-pro-android",
+  "private": true,
+  "version": "61.2.0",
+  "type": "module",
+  "scripts": {
+    "prepare:android-web": "node scripts/prepare-android-web.mjs && node scripts/patch-android-duct-basis.mjs && node scripts/patch-android-license-gates.mjs && node scripts/patch-android-license-status-sync.mjs && node scripts/patch-android-billing.mjs && node scripts/patch-android-billing-bridge.mjs && node scripts/patch-android-license-modal-purchase.mjs && node scripts/patch-android-subscription-lifecycle.mjs && node scripts/patch-android-trial-purchase-entry.mjs && node scripts/patch-android-data-backup.mjs && node scripts/patch-android-project-management.mjs && node scripts/patch-android-jalali-dates.mjs && node scripts/patch-android-m14-evidence-pages.mjs",
+    "patch:android": "node scripts/patch-android.mjs && node scripts/patch-android-version.mjs && node scripts/patch-android-backup-native.mjs && test -s android-icons-v61.2.zip && unzip -o android-icons-v61.2.zip -d android/app/src/main/res && test -s assets/android-splash/fep_splash.webp && node scripts/patch-android-splash.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.0.0"
+  }
+}
