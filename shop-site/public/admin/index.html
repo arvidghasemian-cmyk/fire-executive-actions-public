@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>مدیریت فروشگاه | سروش ایمنی شهر</title>
+<style>
+:root{--r:#c4161c;--ink:#111827;--mut:#667085;--line:#e5e7eb;--soft:#f8fafc;--green:#067647}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);font-family:Tahoma,Arial,sans-serif;color:var(--ink)}
+button,input,select,textarea{font:inherit}
+.wrap{width:min(1100px,calc(100% - 24px));margin:24px auto}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+h1{font-size:23px;margin:0 0 5px}h2{font-size:17px;margin:0 0 12px}
+.mut{color:var(--mut);font-size:11px}
+.login{display:flex;gap:8px;margin-top:12px}.login input{flex:1}
+input,select,textarea{border:1px solid var(--line);border-radius:9px;padding:8px;background:#fff;width:100%}
+textarea{min-height:74px;resize:vertical}
+.btn{border:0;border-radius:9px;padding:9px 12px;font-weight:700;cursor:pointer}
+.red{background:var(--r);color:#fff}.gray{background:#f2f4f7}.danger{background:#fff1f3;color:#b42318}
+.hidden{display:none!important}
+.toolbar{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.products{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.prod{border:1px solid var(--line);border-radius:14px;padding:12px}
+.prod-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:9px}
+.prod-head h3{font-size:13px;margin:0}.prod-head a{font-size:10px;color:var(--r)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.f{display:grid;gap:4px}.f label{font-size:9px;color:var(--mut)}.f.full{grid-column:1/-1}
+.check{display:flex;gap:7px;align-items:center;font-size:10px;color:#475467}.check input{width:auto}
+.advanced{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.advanced summary{cursor:pointer;font-size:11px;font-weight:700;color:#475467}
+.seo-state{font-size:10px;padding:7px 9px;border-radius:8px;background:#fff7ed;color:#b54708;margin:8px 0}
+.seo-state.ok{background:#ecfdf3;color:#067647}
+.upload-box{grid-column:1/-1;border:1px dashed #d0d5dd;border-radius:12px;padding:10px;background:#fafafa}
+.upload-title{font-size:10px;font-weight:700;margin-bottom:8px}
+.preview{height:170px;border:1px solid var(--line);border-radius:10px;background:#fff;display:grid;place-items:center;overflow:hidden;margin-bottom:8px}
+.preview img{width:100%;height:100%;object-fit:contain}
+.preview .empty{font-size:10px;color:var(--mut)}
+.upload-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:7px}
+.upload-actions .btn{flex:1;min-width:135px}
+.file-info{font-size:9px;color:var(--mut);margin-top:6px;line-height:1.7}
+.upload-result{margin-top:7px}
+.prod .save{margin-top:10px;width:100%}
+.orders{display:grid;gap:10px}
+.order{border:1px solid var(--line);border-radius:14px;padding:12px}
+.order-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.items{font-size:11px;color:#475467;margin:10px 0;display:grid;gap:5px}
+.item{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--line);padding-bottom:5px}
+.total{font-weight:700;color:var(--r);margin:7px 0}.inventory{font-size:10px;color:var(--green);margin:6px 0}
+.history{margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-size:10px;color:#475467}.history div{margin:4px 0}
+.notice{padding:10px;border-radius:10px;font-size:11px;margin-top:10px}.ok{background:#ecfdf3;color:#067647}.bad{background:#fff1f3;color:#b42318}
+@media(max-width:720px){.products{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.f.full,.upload-box{grid-column:auto}.login{flex-direction:column}.preview{height:210px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<section class="card" id="loginCard">
+  <h1>مدیریت سروش ایمنی شهر</h1>
+  <div class="mut">محصولات، تصویر واقعی، SEO، موجودی و سفارش‌ها از این صفحه مدیریت می‌شوند.</div>
+  <form id="loginForm" class="login">
+    <input id="token" type="password" autocomplete="current-password" placeholder="رمز مدیریت" required>
+    <button class="btn red">ورود</button>
+  </form>
+  <div id="loginMsg"></div>
+</section>
+
+<div id="panel" class="hidden">
+  <section class="card">
+    <div class="toolbar">
+      <div>
+        <h2>محصولات</h2>
+        <div class="mut">برای عکس واقعی می‌توانی مستقیم از گوشی فایل انتخاب کنی؛ تصویر قبل از ارسال به WebP سبک تبدیل می‌شود.</div>
+      </div>
+      <div>
+        <button class="btn gray" id="openBulkSeo" type="button">ویرایش گروهی سئو</button>
+        <button class="btn gray" id="refreshProducts">به‌روزرسانی</button>
+        <button class="btn gray" id="logout">خروج</button>
+      </div>
+    </div>
+    <div class="grid" style="margin-bottom:12px">
+      <label class="f full">جستجوی نام، برند، مدل یا کد کالا<input id="productSearch" type="search"></label>
+      <label class="f">دسته‌بندی<select id="productCategory"><option value="">همه دسته‌ها</option></select></label>
+      <label class="f">وضعیت<select id="productStatus"><option value="">همه وضعیت‌ها</option><option value="quote">استعلامی</option><option value="priced">دارای قیمت</option><option value="hidden">مخفی</option></select></label>
+      <label class="f">موجودی<select id="productStock"><option value="">همه موجودی‌ها</option><option value="available">موجود</option><option value="out">ناموجود</option><option value="low">کم‌موجود</option><option value="unknown">نامشخص</option></select></label>
+      <label class="f">نمایش<select id="productActive"><option value="active">فعال</option><option value="archived">آرشیوشده</option><option value="">همه</option></select></label>
+    </div>
+    <div id="productCount" class="mut" role="status"></div>
+    <div class="products" id="products"></div>
+  </section>
+
+<section class="card hidden" id="bulkSeoPanel">
+ <div class="toolbar"><h2>ویرایش گروهی عنوان و توضیحات سئو</h2><button type="button" class="btn gray" id="bulkSeoClose">بستن</button></div>
+ <p class="mut">فقط فیلدهای عنوان SEO و توضیح SEO ذخیره می‌شوند. قبل از ذخیره، پیشنهاد هر محصول را بازبینی کنید.</p>
+ <div style="overflow-x:auto"><table style="width:100%;min-width:780px;border-collapse:separate;border-spacing:7px">
+ <thead><tr><th><label><input id="bulkSeoSelectAll" type="checkbox"> انتخاب</label></th><th>عنوان SEO</th><th>توضیح SEO</th><th>پیشنهاد</th><th>وضعیت</th></tr></thead>
+ <tbody id="bulkSeoRows"></tbody></table></div>
+ <p id="bulkSeoMessage" role="status" class="mut"></p><button type="button" class="btn red" id="bulkSeoSave">ذخیره موارد انتخاب‌شده</button></section>
+  <section class="card">
+    <div class="toolbar">
+      <div>
+        <h2>درخواست‌های خرید</h2>
+        <div class="mut">مبلغ سفارش، وضعیت، تاریخچه و اثر آن روی موجودی از این بخش مدیریت می‌شود.</div>
+      </div>
+      <button class="btn gray" id="refreshOrders">به‌روزرسانی</button>
+    </div>
+    <div class="orders" id="orders"></div>
+  </section>
+</div>
+</main>
+
+<script src="/admin/product-tools.js"></script>
+<script src="/admin/bulk-seo.js" defer></script>
+<script>
+const $=id=>document.getElementById(id);
+const fa=n=>new Intl.NumberFormat('fa-IR').format(n??0);
+const money=n=>fa(n)+' تومان';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function msg(el,text,ok=false){el.innerHTML=`<div class="notice ${ok?'ok':'bad'}">${esc(text)}</div>`}
+async function api(url,opt={}){
+  const r=await fetch(url,{...opt,headers:{'content-type':'application/json',...(opt.headers||{})}});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw Object.assign(new Error(d.error||'خطا در ارتباط'),{status:r.status});
+  return d;
+}
+async function apiForm(url,form,method='POST'){
+  const r=await fetch(url,{method,body:form,credentials:'same-origin'});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw Object.assign(new Error(d.error||'خطا در آپلود تصویر'),{status:r.status});
+  return d;
+}
+function isInternalUploadedImage(url){return String(url||'').startsWith('/media/product/')}
+function previewHtml(url,name){
+  return url?`<img src="${esc(url)}" alt="${esc(name||'تصویر محصول')}">`:'<div class="empty">هنوز تصویری انتخاب نشده است</div>';
+}
+async function loadProducts(){
+  const [basic,extra,categories]=await Promise.all([api('/api/admin/commerce/products'),api('/api/admin/product-details'),api('/api/admin/categories')]);
+  const selected=$('productCategory').value;
+  $('productCategory').innerHTML='<option value="">همه دسته‌ها</option>'+categories.categories.map(c=>`<option value="${esc(c.slug)}">${esc(c.name)}</option>`).join('');
+  $('productCategory').value=selected;
+  const ex=new Map(extra.products.map(x=>[x.slug,x]));
+  $('products').innerHTML=basic.products.map(p=>{
+    const d=ex.get(p.slug)||{},image=d.image_url??p.image_url??'',internal=isInternalUploadedImage(image);
+    return `<article class="prod" data-slug="${esc(p.slug)}" data-category="${esc(p.category)}" data-status="${esc(p.status)}" data-active="${p.is_active}" data-stock="${p.stock_qty??''}" data-low="${p.low_stock_threshold??3}" data-track="${p.track_inventory}" data-search="${esc([p.name,p.slug,d.brand,d.model,d.sku].join(' '))}">
+      <div class="prod-head"><h3>${esc(p.name)}</h3><a href="/product/${encodeURIComponent(p.slug)}/" target="_blank">مشاهده صفحه محصول ↗</a></div>
+      <div class="grid">
+        <div class="f"><label>قیمت (تومان)</label><input class="price" inputmode="numeric" value="${p.price_toman??''}"></div>
+        <div class="f"><label>موجودی</label><input class="stock" inputmode="numeric" value="${p.stock_qty??''}"></div>
+        <div class="f"><label>وضعیت</label><select class="status"><option value="quote" ${p.status==='quote'?'selected':''}>استعلام قیمت</option><option value="priced" ${p.status==='priced'?'selected':''}>دارای قیمت</option><option value="hidden" ${p.status==='hidden'?'selected':''}>مخفی</option></select></div>
+        <div class="f"><label>ترتیب</label><input class="sort" inputmode="numeric" value="${p.sort_order??0}"></div>
+        <div class="f full"><label>نام محصول</label><input class="name" value="${esc(p.name)}"></div>
+        <div class="f"><label>دسته‌بندی</label><select class="category">${categories.categories.filter(c=>Number(c.is_active)||c.slug===p.category).map(c=>`<option value="${esc(c.slug)}" ${c.slug===p.category?'selected':''}>${esc(c.name)}${Number(c.is_active)?'':' (غیرفعال)'}</option>`).join('')}</select></div>
+        <label class="check"><input type="checkbox" class="activeProduct" ${Number(p.is_active)?'checked':''}> محصول فعال باشد</label>
+        <div class="f full"><label>توضیح محصول</label><textarea class="desc">${esc(p.description??'')}</textarea></div>
+      </div>
+
+      <details class="advanced">
+        <summary>اطلاعات واقعی، تصویر و SEO</summary>
+        <div class="grid" style="margin-top:8px">
+          <div class="f"><label>برند</label><input class="brand" value="${esc(d.brand??'')}"></div>
+          <div class="f"><label>مدل</label><input class="model" value="${esc(d.model??'')}"></div>
+          <div class="f"><label>کد کالا / SKU</label><input class="sku" value="${esc(d.sku??'')}"></div>
+          <div class="f"><label>آدرس تصویر (اختیاری)</label><input class="image" value="${esc(image)}"></div>
+
+          <div class="upload-box">
+            <div class="upload-title">آپلود مستقیم تصویر از گوشی</div>
+            <div class="preview">${previewHtml(image,p.name)}</div>
+            <input class="imageFile" type="file" accept="image/jpeg,image/png,image/webp">
+            <div class="file-info">حداکثر فایل اولیه ۱۲ مگابایت؛ قبل از ارسال به‌صورت خودکار تا عرض/ارتفاع ۱۶۰۰ پیکسل و WebP فشرده می‌شود. فایل نهایی حداکثر ۱٫۵ مگابایت است.</div>
+            <div class="upload-actions">
+              <button type="button" class="btn red uploadImage">آپلود تصویر از گوشی</button>
+              <button type="button" class="btn gray importImageUrl">دریافت تصویر از آدرس بالا</button>
+              <button type="button" class="btn danger deleteImage ${internal?'':'hidden'}">حذف تصویر آپلودی</button>
+            </div>
+            <div class="upload-result"></div>
+          </div>
+
+          <div class="f full"><label>مشخصات فنی؛ هر خط: ویژگی: مقدار</label><textarea class="specs">${esc(d.specs_text??'')}</textarea></div>
+          <div class="f full"><label>لینک کاتالوگ واقعی (اختیاری)</label><input class="catalogUrl" dir="ltr" inputmode="url" placeholder="https://..." value="${esc(d.catalog_url??'')}"></div>
+          <div class="f full"><label>لینک دیتاشیت فنی واقعی (اختیاری)</label><input class="datasheetUrl" dir="ltr" inputmode="url" placeholder="https://..." value="${esc(d.datasheet_url??'')}"></div>
+          <div class="f full"><label>عنوان SEO</label><input class="seoTitle" value="${esc(d.seo_title??'')}"></div>
+          <div class="f full"><label>توضیح SEO</label><textarea class="seoDesc">${esc(d.seo_description??'')}</textarea></div>
+          <label class="check"><input type="checkbox" class="sample" ${Number(d.image_is_sample)!==0?'checked':''}> تصویر فعلی نمونه است</label>
+          <label class="check"><input type="checkbox" class="seoReady" ${Number(d.seo_ready)===1?'checked':''}> آماده انتشار در گوگل</label>
+        </div>
+      </details>
+
+      <div class="seo-state ${d.effective_indexable?'ok':''}">${d.effective_indexable?'این صفحه شرایط ایندکس را دارد.':'فعلاً noindex است؛ اطلاعات واقعی را کامل کن.'}</div>
+      <button class="btn red save">ذخیره محصول</button>
+      <div class="result"></div>
+    </article>`;
+  }).join('');
+
+  applyProductFilters();
+  document.querySelectorAll('.save').forEach(b=>b.onclick=saveProduct);
+  document.querySelectorAll('.imageFile').forEach(i=>i.onchange=previewSelectedImage);
+  document.querySelectorAll('.uploadImage').forEach(b=>b.onclick=uploadImage);
+  document.querySelectorAll('.importImageUrl').forEach(b=>b.onclick=importImageUrl);
+  document.querySelectorAll('.deleteImage').forEach(b=>b.onclick=deleteUploadedImage);
+  document.dispatchEvent(new Event('shop:products'));
+}
+function applyProductFilters(){
+  let count=0;document.querySelectorAll('#products .prod').forEach(card=>{
+    const visible=ProductTools.matches(card.dataset,{q:$('productSearch').value,category:$('productCategory').value,status:$('productStatus').value,stock:$('productStock').value,active:$('productActive').value});
+    card.hidden=!visible;card.style.display=visible?'':'none';if(visible)count++;
+  });$('productCount').textContent=count?fa(count)+' محصول':'محصولی با این فیلترها پیدا نشد.';
+}
+['productSearch','productCategory','productStatus','productStock','productActive'].forEach(id=>$(id).addEventListener('input',applyProductFilters));
+function previewSelectedImage(e){
+  const c=e.target.closest('.prod'),file=e.target.files?.[0],preview=c.querySelector('.preview'),out=c.querySelector('.upload-result');
+  out.innerHTML='';
+  if(!file)return;
+  if(!/^image\/(jpeg|png|webp)$/i.test(file.type)){msg(out,'فرمت فایل باید JPG، PNG یا WebP باشد.');e.target.value='';return}
+  if(file.size>12*1024*1024){msg(out,'حجم فایل اولیه باید کمتر از ۱۲ مگابایت باشد.');e.target.value='';return}
+  if(preview.dataset.objectUrl)URL.revokeObjectURL(preview.dataset.objectUrl);
+  const u=URL.createObjectURL(file);preview.dataset.objectUrl=u;preview.innerHTML=`<img src="${u}" alt="پیش‌نمایش تصویر انتخابی">`;
+  out.innerHTML=`<div class="file-info">انتخاب شد: ${esc(file.name)} — ${fa(Math.round(file.size/1024))} کیلوبایت</div>`;
+}
+function canvasBlob(canvas,type,quality){return new Promise(resolve=>canvas.toBlob(resolve,type,quality))}
+async function decodeImage(file){
+  if('createImageBitmap' in window){
+    try{return await createImageBitmap(file,{imageOrientation:'from-image'})}catch{}
+    try{return await createImageBitmap(file)}catch{}
+  }
+  return await new Promise((resolve,reject)=>{
+    const u=URL.createObjectURL(file),img=new Image();
+    img.onload=()=>{URL.revokeObjectURL(u);resolve(img)};
+    img.onerror=()=>{URL.revokeObjectURL(u);reject(new Error('خواندن تصویر ممکن نشد'))};
+    img.src=u;
+  });
+}
+async function compressImage(file){
+  if(file.size>12*1024*1024)throw new Error('حجم فایل اولیه بیشتر از ۱۲ مگابایت است');
+  const image=await decodeImage(file);
+  const iw=image.width||image.naturalWidth,ih=image.height||image.naturalHeight;
+  if(!iw||!ih)throw new Error('ابعاد تصویر قابل تشخیص نیست');
+  let max=1600,quality=.82,blob=null;
+  for(let pass=0;pass<4;pass++){
+    const scale=Math.min(1,max/Math.max(iw,ih)),w=Math.max(1,Math.round(iw*scale)),h=Math.max(1,Math.round(ih*scale));
+    const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+    const ctx=canvas.getContext('2d',{alpha:true});ctx.drawImage(image,0,0,w,h);
+    blob=await canvasBlob(canvas,'image/webp',quality);
+    if(blob&&blob.size<=1450000)break;
+    max=Math.max(900,Math.round(max*.8));quality=Math.max(.62,quality-.08);
+  }
+  if(image.close)try{image.close()}catch{}
+  if(!blob)throw new Error('فشرده‌سازی تصویر انجام نشد');
+  if(blob.size>1500000)throw new Error('حجم تصویر پس از فشرده‌سازی هنوز بیش از ۱٫۵ مگابایت است؛ یک عکس کوچک‌تر انتخاب کن');
+  const base=(file.name||'product').replace(/\.[^.]+$/,'').replace(/[^\w.-]+/g,'-').slice(0,80)||'product';
+  return new File([blob],base+'.webp',{type:'image/webp'});
+}
+async function uploadImage(e){
+  const c=e.target.closest('.prod'),slug=c.dataset.slug,fileInput=c.querySelector('.imageFile'),out=c.querySelector('.upload-result'),button=e.currentTarget,file=fileInput.files?.[0];
+  if(!file){msg(out,'اول یک تصویر از گوشی انتخاب کن.');return}
+  button.disabled=true;button.textContent='در حال آماده‌سازی...';
+  try{
+    const compressed=await compressImage(file);
+    button.textContent='در حال آپلود...';
+    const form=new FormData();form.append('image',compressed,compressed.name);
+    const d=await apiForm('/api/admin/product-image/'+encodeURIComponent(slug),form);
+    c.querySelector('.image').value=d.url;
+    c.querySelector('.sample').checked=false;
+    msg(out,`تصویر با موفقیت آپلود شد — ${fa(Math.round(d.size_bytes/1024))} کیلوبایت`,true);
+    await loadProducts();
+  }catch(err){msg(out,err.message)}
+  finally{button.disabled=false;button.textContent='آپلود تصویر از گوشی'}
+}
+async function importImageUrl(e){
+  const c=e.target.closest('.prod'),slug=c.dataset.slug,out=c.querySelector('.upload-result'),button=e.currentTarget,url=c.querySelector('.image').value.trim();
+  if(!url){msg(out,'اول آدرس تصویر را در فیلد آدرس تصویر وارد کن.');return}
+  button.disabled=true;button.textContent='در حال دریافت...';
+  try{
+    const d=await api('/api/admin/product-image-import/'+encodeURIComponent(slug),{method:'POST',body:JSON.stringify({url})});
+    c.querySelector('.image').value=d.url;c.querySelector('.sample').checked=false;
+    msg(out,`تصویر به Media داخلی فروشگاه منتقل شد — ${fa(Math.round(d.size_bytes/1024))} کیلوبایت`,true);
+    await loadProducts();
+  }catch(err){msg(out,err.message)}
+  finally{button.disabled=false;button.textContent='دریافت تصویر از آدرس بالا'}
+}
+async function deleteUploadedImage(e){
+  const c=e.target.closest('.prod'),slug=c.dataset.slug,out=c.querySelector('.upload-result');
+  if(!confirm('تصویر آپلودشده این محصول حذف شود؟'))return;
+  try{
+    const r=await fetch('/api/admin/product-image/'+encodeURIComponent(slug),{method:'DELETE',credentials:'same-origin'});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(d.error||'حذف تصویر انجام نشد');
+    msg(out,'تصویر آپلودشده حذف شد.',true);
+    await loadProducts();
+  }catch(err){msg(out,err.message)}
+}
+async function saveProduct(e){
+  const c=e.target.closest('.prod'),slug=c.dataset.slug,res=c.querySelector('.result'),num=sel=>ProductTools.number(c.querySelector(sel).value);
+  try{
+    const image=c.querySelector('.image').value.trim();
+    await api('/api/admin/products/'+encodeURIComponent(slug),{method:'PUT',body:JSON.stringify({
+      name:c.querySelector('.name').value,status:c.querySelector('.status').value,price_toman:num('.price'),
+      stock_qty:num('.stock'),sort_order:num('.sort'),description:c.querySelector('.desc').value,image_url:image,category:c.querySelector('.category').value,is_active:c.querySelector('.activeProduct').checked
+    })});
+    await api('/api/admin/product-details/'+encodeURIComponent(slug),{method:'PUT',body:JSON.stringify({
+      brand:c.querySelector('.brand').value,model:c.querySelector('.model').value,sku:c.querySelector('.sku').value,
+      specs_text:c.querySelector('.specs').value,catalog_url:c.querySelector('.catalogUrl').value,datasheet_url:c.querySelector('.datasheetUrl').value,
+      seo_title:c.querySelector('.seoTitle').value,seo_description:c.querySelector('.seoDesc').value,image_url:image,
+      image_is_sample:c.querySelector('.sample').checked,seo_ready:c.querySelector('.seoReady').checked
+    })});
+    msg(res,'محصول و صفحه اختصاصی به‌روزرسانی شد',true);
+    await loadProducts();
+  }catch(err){msg(res,err.message)}
+}
+
+const labels={new:'جدید',contacted:'تماس گرفته شد',quoted:'قیمت اعلام شد',confirmed:'تأیید شد',ready_to_ship:'آماده ارسال',shipped:'ارسال شد',closed:'بسته شد',cancelled:'لغو شد'};
+function orderTotal(o){const ok=o.items.length&&o.items.every(i=>Number.isInteger(i.unit_price_toman));return ok?o.items.reduce((s,i)=>s+i.unit_price_toman*i.quantity,0):null}
+async function loadOrders(){
+  const d=await api('/api/admin/orders?limit=100');
+  $('orders').innerHTML=d.orders.length?d.orders.map(o=>{
+    const total=orderTotal(o);
+    return `<article class="order" data-id="${o.id}">
+      <div class="order-head"><strong>${esc(o.order_code)}</strong><span>${new Date(o.created_at).toLocaleString('fa-IR')}</span></div>
+      <div class="mut">${esc(o.customer_name)} — ${esc(o.phone)}${o.city?' — '+esc(o.city):''}${o.company?' — '+esc(o.company):''}</div>
+      <div class="items">${o.items.map(i=>`<div class="item"><span>${esc(i.product_name)} × ${fa(i.quantity)}</span><span>${Number.isInteger(i.unit_price_toman)?money(i.unit_price_toman)+' / جمع '+money(i.unit_price_toman*i.quantity):'استعلام قیمت'}</span></div>`).join('')}</div>
+      <div class="total">${total===null?'جمع: دارای قلم استعلامی':'جمع کل: '+money(total)}</div>
+      <div class="inventory">${Number(o.inventory_applied)===1?'موجودی این سفارش از انبار کسر شده است':'هنوز از موجودی انبار کسر نشده است'}</div>
+      ${o.notes?`<div class="mut">توضیح: ${esc(o.notes)}</div>`:''}
+      <select class="orderStatus">${Object.entries(labels).map(([k,v])=>`<option value="${k}" ${o.status===k?'selected':''}>${v}</option>`).join('')}</select>
+      <button class="btn gray orderSave">ذخیره وضعیت</button>
+      <div class="history"><strong>تاریخچه وضعیت</strong>${(o.history||[]).length?(o.history||[]).map(h=>`<div>${esc(labels[h.to_status]||h.to_status)} — ${new Date(h.changed_at).toLocaleString('fa-IR')}</div>`).join(''):'<div>بدون سابقه ثبت‌شده</div>'}</div>
+      <div class="result"></div>
+    </article>`;
+  }).join(''):'<div class="mut">هنوز درخواستی ثبت نشده.</div>';
+  document.querySelectorAll('.orderSave').forEach(b=>b.onclick=saveOrder);
+}
+async function saveOrder(e){
+  const c=e.target.closest('.order'),res=c.querySelector('.result');
+  try{
+    await api('/api/admin/orders/'+c.dataset.id,{method:'PATCH',body:JSON.stringify({status:c.querySelector('.orderStatus').value})});
+    msg(res,'وضعیت ذخیره شد',true);
+    await Promise.all([loadOrders(),loadProducts()]);
+  }catch(err){msg(res,err.message)}
+}
+async function enter(){
+  try{
+    await Promise.all([loadProducts(),loadOrders()]);
+    $('loginCard').classList.add('hidden');$('panel').classList.remove('hidden');
+  }catch(err){
+    if(err.status===503)msg($('loginMsg'),'پنل آماده است اما رمز مدیریت هنوز روی سرور فعال نشده.');
+  }
+}
+$('loginForm').onsubmit=async e=>{
+  e.preventDefault();$('loginMsg').innerHTML='';
+  try{await api('/api/admin/login',{method:'POST',body:JSON.stringify({token:$('token').value})});$('token').value='';await enter()}
+  catch(err){msg($('loginMsg'),err.message)}
+};
+$('refreshProducts').onclick=loadProducts;
+$('refreshOrders').onclick=loadOrders;
+$('logout').onclick=async()=>{await api('/api/admin/logout',{method:'POST',body:'{}'}).catch(()=>{});location.reload()};
+enter();
+</script>
+<script src="/admin/gallery-addon.js" defer></script>
+<script src="/admin/payment-addon.js" defer></script>
+<script src="/admin/commerce-admin.js" defer></script>
+<script src="/admin/commerce-advanced.js" defer></script>
+<script src="/admin/management-admin.js" defer></script>
+</body>
+</html>
+
