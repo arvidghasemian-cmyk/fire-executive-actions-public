@@ -1,0 +1,118 @@
+name: Build Fire Executive Pro Android v61.2 Public QA
+
+on:
+  push:
+    branches:
+      - android-public-build-v1
+    paths:
+      - ".github/android-public-build-trigger.txt"
+      - ".github/workflows/build-android-public-v61.2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-v61.2-public-qa
+  cancel-in-progress: true
+
+jobs:
+  build-unsigned-public-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout public Android QA branch
+        uses: actions/checkout@v4
+        with:
+          ref: android-public-build-v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install Capacitor dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Verify stable v61.2 web baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s index.html
+          test -s license-manager-v61.js
+          test -s manifest.json
+          test -s sw.js
+          grep -F "v61.2-OFFLINE-FIX" index.html
+          grep -F "v61.2-offline-fix" index.html
+          node --check license-manager-v61.js
+          node --check scripts/patch-android-subscription-lifecycle.mjs
+          node --check scripts/patch-android-data-backup.mjs
+          node --check scripts/patch-android-backup-native.mjs
+          node --check scripts/patch-android-billing.mjs
+          node --check scripts/patch-android-license-gates.mjs
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, collections, subprocess
+          s=Path('index.html').read_text(encoding='utf-8')
+          ids=re.findall(r'\bid="([^"]+)"',s)
+          dup=[k for k,v in collections.Counter(ids).items() if v>1]
+          sections=re.findall(r'\bid="sec-[^"]+"',s)
+          if dup: raise SystemExit('duplicate IDs found: '+','.join(dup[:10]))
+          if len(sections)!=28: raise SystemExit(f'expected 28 sec-* sections, got {len(sections)}')
+          scripts=[]
+          for m in re.finditer(r'<script(?P<attrs>[^>]*)>(?P<body>.*?)</script>',s,re.I|re.S):
+              if not re.search(r'\bsrc\s*=',m.group('attrs'),re.I): scripts.append(m.group('body'))
+          for i,body in enumerate(scripts,1):
+              f=Path(f'/tmp/fep-inline-{i}.js')
+              f.write_text(body,encoding='utf-8')
+              r=subprocess.run(['node','--check',str(f)],capture_output=True,text=True)
+              if r.returncode: raise SystemExit(f'inline JS {i} failed syntax check: {r.stderr[:500]}')
+          print(f'Baseline QA OK: {len(ids)} IDs, {len(sections)} sections')
+          PY
+
+      - name: Prepare local Android web assets
+        run: npm run prepare:android-web
+
+      - name: Verify engineering calculator numerics
+        run: node scripts/verify-engineering-calculators.mjs
+
+      - name: Verify project isolation and backup integrity
+        run: node scripts/verify-project-data-integrity.mjs
+
+      - name: Patch Android report preview and print UI
+        run: node scripts/patch-android-report.mjs
+
+      - name: Patch Android report data and parallel fan calculation
+        run: node scripts/patch-android-report-enhancements.mjs
+
+      - name: Generate Android project
+        run: npx cap add android
+
+      - name: Add required Android permissions and native bridges
+        run: npm run patch:android
+
+      - name: Sync Capacitor project
+        run: npx cap sync android
+
+      - name: Build unsigned release APK
+        working-directory: android
+        run: ./gradlew assembleRelease
+
+      - name: Zipalign and verify unsigned QA APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          UNSIGNED=android/app/build/outputs/apk/release/app-release-unsigned.apk
+          OUT=android/app/build/outputs/apk/release/Fire-Executive-Pro-v61.2-PUBLIC-QA-aligned-unsigned.apk
+          test -s "$UNSIGNED"
+          BUILD_TOOLS=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BUILD_TOOLS/zipalign" -f -p 4 "$UNSIGNED" "$OUT"
+          "$BUILD_TOOLS/zipalign" -c -v -p 4 "$OUT"
+          sha256sum "$OUT"
+          echo "PUBLIC ANDROID QA BUILD: PASS"
