@@ -1,0 +1,10 @@
+(function(){
+  const EN_TO_FA={q:'ض',w:'ص',e:'ث',r:'ق',t:'ف',y:'غ',u:'ع',i:'ه',o:'خ',p:'ح','[':'ج',']':'چ',a:'ش',s:'س',d:'ی',f:'ب',g:'ل',h:'ا',j:'ت',k:'ن',l:'م',';':'ک',"'":'گ',z:'ظ',x:'ط',c:'ز',v:'ر',b:'ذ',n:'د',m:'پ',',':'و'};
+  function normalizePersian(s){return(s||'').normalize('NFKC').replace(/ي|ى/g,'ی').replace(/ك/g,'ک').replace(/\u200c|\u200f|\u200e/g,' ').replace(/ـ/g,'').replace(/[-_]+/g,' ').replace(/[^\u0600-\u06FFa-zA-Z0-9\s]/g,' ').replace(/\s+/g,' ').trim().toLowerCase()}
+  function wrongEnglishToPersian(s){let out='';for(const ch of(s||'').toLowerCase())out+=EN_TO_FA[ch]||ch;return normalizePersian(out)}
+  function compact(s){return normalizePersian(s).replace(/\s/g,'')}
+  function distance(a,b){a=compact(a);b=compact(b);if(a===b)return 0;const m=a.length,n=b.length;if(!m)return n;if(!n)return m;const prev=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(cur[j-1]+1,prev[j]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));for(let j=0;j<=n;j++)prev[j]=cur[j]}return prev[n]}
+  function buildForms(q){const n=normalizePersian(q),restored=wrongEnglishToPersian(q);return[...new Set([n,compact(n),restored,compact(restored)].filter(Boolean))]}
+  function scoreItem(item,query){const forms=buildForms(query);let best=999,matchedBy='';const aliases=(item.aliases||[]).map(normalizePersian);for(const q of forms){for(const a of aliases){if(!q||!a)continue;if(q===a||compact(q)===compact(a))return{score:100,matchedBy:a};if(a.includes(q)||q.includes(a))best=Math.min(best,1);else best=Math.min(best,distance(q,a))}}const maxLen=Math.max(1,...forms.map(x=>compact(x).length));return{score:best===999?0:Math.max(0,95-(best/maxLen)*100),matchedBy}}
+  window.SoroushSmartSearch={normalizePersian,wrongEnglishToPersian,buildForms,search(query,index){if(!normalizePersian(query))return index.map(x=>({...x,_score:100}));return index.map(item=>{const r=scoreItem(item,query);return{...item,_score:r.score,_matchedBy:r.matchedBy}}).filter(x=>x._score>=55).sort((a,b)=>b._score-a._score)}};
+})();

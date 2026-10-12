@@ -1,0 +1,214 @@
+/* Unified mobile storefront header V1 — progressive layer; desktop remains unchanged. */
+.mobile-header-v1{display:none}
+
+@media(max-width:760px){
+  /* Hide the legacy header only after the replacement has mounted successfully. */
+  body.mobile-header-v1-ready .header{display:none!important}
+
+  body.mobile-header-v1-ready .mobile-header-v1{
+    display:block;
+    position:relative;
+    z-index:45;
+    padding:9px 10px 5px;
+    background:
+      radial-gradient(circle at 92% 5%,rgba(159,17,27,.07),transparent 105px),
+      linear-gradient(180deg,#fff,#f7f8fa);
+  }
+  .mobile-header-v1-card{
+    position:relative;
+    overflow:hidden;
+    border:1px solid #e8eaf0;
+    border-radius:22px;
+    background:rgba(255,255,255,.97);
+    box-shadow:0 10px 30px rgba(17,24,39,.07);
+    padding:10px;
+  }
+  .mobile-header-v1-card:before{
+    content:"";
+    position:absolute;
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    top:-105px;
+    right:-45px;
+    background:radial-gradient(circle,rgba(159,17,27,.10),rgba(159,17,27,0) 70%);
+    pointer-events:none;
+  }
+  .mobile-header-v1-top{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    min-height:55px;
+    padding:1px 1px 9px;
+  }
+  .mobile-header-v1-brand{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    min-width:0;
+    color:#172033;
+    text-decoration:none;
+  }
+  .mobile-header-v1-art{
+    width:47px;
+    height:47px;
+    flex:0 0 47px;
+    display:grid;
+    place-items:center;
+    border-radius:15px;
+    background:linear-gradient(145deg,#bd1420,#821019);
+    color:#fff;
+    box-shadow:0 9px 21px rgba(159,17,27,.20);
+    overflow:hidden;
+  }
+  .mobile-header-v1-art svg{width:34px;height:34px;display:block}
+  .mobile-header-v1-copy{min-width:0;display:block;line-height:1.45}
+  .mobile-header-v1-copy strong{
+    display:block;
+    color:#172033;
+    font-size:16px;
+    font-weight:900;
+    letter-spacing:-.25px;
+    white-space:nowrap;
+  }
+  .mobile-header-v1-copy small{
+    display:block;
+    margin-top:2px;
+    color:#7a8494;
+    font-size:9.8px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .mobile-header-v1-cart{
+    position:relative;
+    width:47px;
+    height:47px;
+    min-width:47px;
+    display:grid;
+    place-items:center;
+    border:1px solid #e2e5eb;
+    border-radius:15px;
+    background:#fff;
+    color:#172033;
+    box-shadow:0 5px 15px rgba(17,24,39,.045);
+    cursor:pointer;
+    font:inherit;
+  }
+  .mobile-header-v1-cart svg{width:23px;height:23px;stroke:currentColor}
+  .mobile-header-v1-cart-count{
+    position:absolute;
+    top:-5px;
+    left:-5px;
+    min-width:19px;
+    height:19px;
+    padding:0 4px;
+    display:grid;
+    place-items:center;
+    border:2px solid #fff;
+    border-radius:999px;
+    background:#b61320;
+    color:#fff;
+    font-size:9px;
+    font-weight:900;
+    line-height:1;
+    box-shadow:0 3px 8px rgba(159,17,27,.22);
+  }
+  .mobile-header-v1-search{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    min-height:47px;
+    padding:4px;
+    border:1px solid #dfe3ea;
+    border-radius:15px;
+    background:#f7f8fa;
+    transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
+  }
+  .mobile-header-v1-search:focus-within{
+    background:#fff;
+    border-color:#d5aa37;
+    box-shadow:0 0 0 3px rgba(227,166,18,.11);
+  }
+  .mobile-header-v1-search-icon{
+    width:20px;
+    height:20px;
+    margin-right:8px;
+    flex:0 0 20px;
+    color:#8b94a3;
+  }
+  .mobile-header-v1-search-icon svg{display:block;width:100%;height:100%;stroke:currentColor}
+  .mobile-header-v1-search input{
+    flex:1 1 auto;
+    min-width:0;
+    height:38px;
+    padding:0 4px;
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+    color:#172033;
+    font:inherit;
+    font-size:12.2px;
+  }
+  .mobile-header-v1-search input::placeholder{color:#9098a6;opacity:1}
+  .mobile-header-v1-search button{
+    flex:0 0 auto;
+    min-width:70px;
+    height:39px;
+    padding:0 11px;
+    border:0;
+    border-radius:11px;
+    background:linear-gradient(135deg,#b71420,#8d1019);
+    color:#fff;
+    font:inherit;
+    font-size:11.5px;
+    font-weight:900;
+    box-shadow:0 6px 14px rgba(159,17,27,.17);
+    cursor:pointer;
+  }
+
+  /* Searching is an intentional exception to the compact mobile home: reveal
+     the existing real filtered product area only while a search is active. */
+  body.storefront-v2.mobile-search-active #products{display:block!important;padding-top:14px!important}
+  body.storefront-v2.mobile-search-active #homeV2Categories,
+  body.storefront-v2.mobile-search-active .mobile-product-shelf{display:none!important}
+
+  @media(max-width:380px){
+    .mobile-header-v1-copy strong{font-size:14.5px}
+    .mobile-header-v1-copy small{font-size:9px}
+    .mobile-header-v1-art,.mobile-header-v1-cart{width:44px;height:44px;min-width:44px}
+    .mobile-header-v1-art{flex-basis:44px}
+    .mobile-header-v1-search button{min-width:64px;padding-inline:9px}
+  }
+}
+
+@media(min-width:761px){.mobile-header-v1{display:none!important}}
+
+@media(prefers-reduced-motion:reduce){
+  .mobile-header-v1-search{transition:none!important}
+}
+
+
+/* Professional brand logo V3 */
+@media(max-width:760px){
+  .mobile-header-v1-brand.mobile-header-v1-brand-logo-ready{
+    flex:1 1 auto;
+    min-width:0;
+    max-width:calc(100% - 58px);
+  }
+  .mobile-header-v1-brand-logo-img{
+    display:block;
+    width:190px;
+    max-width:100%;
+    height:auto;
+    max-height:62px;
+    object-fit:contain;
+    object-position:right center;
+  }
+}
+@media(max-width:380px){
+  .mobile-header-v1-brand-logo-img{width:172px;max-height:57px}
+}
