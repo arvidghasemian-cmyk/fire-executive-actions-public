@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const admin=fs.readFileSync('shop-site/public/admin/index.html','utf8');
+const bulk=fs.readFileSync('shop-site/public/admin/bulk-seo.js','utf8');
+new vm.Script(bulk,{filename:'bulk-seo.js'});
+assert.match(admin,/id="openBulkSeo"/);
+assert.match(admin,/id="bulkSeoPanel"/);
+assert.match(admin,/src="\/admin\/bulk-seo\.js" defer/);
+for(const id of ['bulkSeoRows','bulkSeoMessage','bulkSeoSave','bulkSeoClose','bulkSeoSelectAll'])assert.match(admin,new RegExp('id="'+id+'"'));
+assert.match(bulk,/\/api\/admin\/product-details/);
+assert.match(bulk,/seo_title:title,seo_description:desc/);
+assert.doesNotMatch(bulk,/method:'PUT',body:JSON\.stringify\(\{[^}]*brand:/s);
+assert.match(bulk,/saved\.seo_title!==title\|\|saved\.seo_description!==desc/);
+assert.match(bulk,/if\(!confirm\(/);
+console.log('PASS: bulk SEO script syntax, UI wiring, SEO-only payload, save verification and confirmation');
