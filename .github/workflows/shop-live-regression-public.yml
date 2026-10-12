@@ -27,8 +27,12 @@ jobs:
           curl -fsS "$PROD_URL/api/health" -o /tmp/prod-health.json
           jq -e '.ok == true and .service == "soroush-shop"' /tmp/prod-health.json
 
-          curl -fsS -H 'Cache-Control: no-cache' "$PROD_URL/" -o /tmp/home.html
+          curl -fsS -H 'Cache-Control: no-cache' "$PROD_URL/?qa=product-card-v3" -o /tmp/home.html
           grep -F 'سروش ایمنی شهر' /tmp/home.html
+
+          curl -fsS -H 'Cache-Control: no-cache' "$PROD_URL/storefront-v2.css?qa=product-card-v3" -o /tmp/storefront.css
+          grep -F 'Mobile product-card containment V3' /tmp/storefront.css
+          grep -F 'grid-template-columns:repeat(2,minmax(0,1fr))' /tmp/storefront.css
 
           curl -fsS "$PROD_URL/robots.txt" -o /tmp/robots.txt
           grep -F 'User-agent: *' /tmp/robots.txt
