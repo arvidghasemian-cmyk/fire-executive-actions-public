@@ -2,6 +2,11 @@ name: Public Actions Smoke Test
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/actions-smoke-trigger.txt"
 
 permissions:
   contents: read
