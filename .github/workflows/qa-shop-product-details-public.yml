@@ -1,0 +1,47 @@
+name: QA Soroush Shop Product Details (Public Runner)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/shop-product-details-trigger.txt"
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      STAGING_URL: https://soroush-imeni-shahr-shop-staging.arvidghasemian.workers.dev
+    steps:
+      - name: Verify live product details and SEO gating
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in {1..15}; do
+            if curl -fsS "$STAGING_URL/product/city-gas-leak-detector/" > /tmp/product-page.html && grep -F 'در حال تکمیل / NOINDEX' /tmp/product-page.html >/dev/null; then
+              break
+            fi
+            sleep 2
+          done
+
+          curl -fsS "$STAGING_URL/api/health" > /tmp/health.json
+          jq -e '.ok == true and .product_details == "v1"' /tmp/health.json
+
+          curl -fsS "$STAGING_URL/api/products/city-gas-leak-detector" > /tmp/product.json
+          jq -e 'has("brand") and has("model") and has("image_is_sample") and has("seo_ready") and .effective_indexable == false' /tmp/product.json
+
+          grep -F '<meta name="robots" content="noindex,follow">' /tmp/product-page.html
+          grep -F 'نشت‌یاب گاز شهری' /tmp/product-page.html
+          grep -F 'در حال تکمیل / NOINDEX' /tmp/product-page.html
+
+          STATUS="$(curl -sS -o /tmp/admin-details.json -w "%{http_code}" "$STAGING_URL/api/admin/product-details")"
+          test "$STATUS" = "401"
+
+          curl -fsS "$STAGING_URL/admin/" > /tmp/admin-page.html
+          grep -F 'اطلاعات واقعی، تصویر و SEO' /tmp/admin-page.html
+          grep -F 'آماده انتشار در گوگل' /tmp/admin-page.html
