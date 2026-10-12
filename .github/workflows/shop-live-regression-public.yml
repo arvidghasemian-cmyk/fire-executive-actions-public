@@ -1,0 +1,65 @@
+name: Soroush Shop Live Regression QA
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 2 * * *"
+  push:
+    branches: [main]
+    paths:
+      - ".github/shop-live-regression-trigger.txt"
+
+permissions:
+  contents: read
+
+jobs:
+  live-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      PROD_URL: https://shop.fireexecutive.ir
+      STAGING_URL: https://soroush-imeni-shahr-shop-staging.arvidghasemian.workers.dev
+    steps:
+      - name: Production health and public surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS "$PROD_URL/api/health" -o /tmp/prod-health.json
+          jq -e '.ok == true and .service == "soroush-shop"' /tmp/prod-health.json
+
+          curl -fsS -H 'Cache-Control: no-cache' "$PROD_URL/" -o /tmp/home.html
+          grep -F 'سروش ایمنی شهر' /tmp/home.html
+
+          curl -fsS "$PROD_URL/robots.txt" -o /tmp/robots.txt
+          grep -F 'User-agent: *' /tmp/robots.txt
+          grep -F 'Allow: /' /tmp/robots.txt
+          grep -F 'Disallow: /admin/' /tmp/robots.txt
+
+          curl -fsS "$PROD_URL/sitemap.xml" -o /tmp/sitemap.xml
+          for slug in gas-detectors fire-extinguishers fire-alarm sprinklers firebox-hosereel fire-pumps; do
+            grep -F "https://shop.fireexecutive.ir/category/$slug/" /tmp/sitemap.xml
+          done
+
+      - name: Production SEO and access controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS "$PROD_URL/category/fire-extinguishers/" -o /tmp/ext.html
+          grep -F '<title>' /tmp/ext.html
+
+          curl -fsS "$PROD_URL/category/fire-alarm/" -o /tmp/alarm.html
+          grep -F '<title>' /tmp/alarm.html
+
+          STATUS="$(curl -sS -o /tmp/admin-api.json -w "%{http_code}" "$PROD_URL/api/admin/product-details")"
+          test "$STATUS" = "401" || test "$STATUS" = "404"
+
+      - name: Staging product details gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS "$STAGING_URL/api/health" -o /tmp/staging-health.json
+          jq -e '.ok == true and .product_details == "v1"' /tmp/staging-health.json
+
+          curl -fsS "$STAGING_URL/product/city-gas-leak-detector/" -o /tmp/product.html
+          grep -F 'در حال تکمیل / NOINDEX' /tmp/product.html
+          grep -F '<meta name="robots" content="noindex,follow">' /tmp/product.html
