@@ -1,0 +1,19 @@
+name: Public Actions Smoke Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Verify runner
+        shell: bash
+        run: |
+          echo "GitHub Actions public-repo smoke test"
+          uname -a
+          echo "PASS"
